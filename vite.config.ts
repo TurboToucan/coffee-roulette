@@ -6,5 +6,5 @@ import tailwindcss from '@tailwindcss/vite'
 // Change to '/' if hosting at a root domain.
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: '/coffee-roulette/',
+  base: '/',
 })
