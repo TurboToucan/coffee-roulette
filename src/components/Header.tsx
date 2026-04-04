@@ -1,4 +1,4 @@
-import { Download, Upload } from 'lucide-react';
+import { Download, Upload, RotateCcw } from 'lucide-react';
 import type { AppState } from '../types';
 import { exportToJson, importFromJson } from '../storage';
 import { useRef } from 'react';
@@ -6,9 +6,10 @@ import { useRef } from 'react';
 interface Props {
   state: AppState;
   onImport: (state: AppState) => void;
+  onReset: () => void;
 }
 
-export default function Header({ state, onImport }: Props) {
+export default function Header({ state, onImport, onReset }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,6 +58,16 @@ export default function Header({ state, onImport }: Props) {
         >
           <Download size={15} />
           Export
+        </button>
+        <button
+          onClick={() => {
+            if (confirm('Reset all session data? This cannot be undone.')) onReset();
+          }}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+          title="Reset session"
+        >
+          <RotateCcw size={15} />
+          Reset
         </button>
       </div>
     </header>

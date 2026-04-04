@@ -118,12 +118,19 @@ export default function App() {
     showToast('Session imported successfully!');
   }, []);
 
+  const handleReset = useCallback(() => {
+    setState(EMPTY_STATE);
+    setPendingPairs([]);
+    setSpinDone(false);
+    showToast('Session reset');
+  }, []);
+
   const activeCount = state.participants.filter((p) => p.active).length;
   const canGenerate = activeCount >= 2 && !isSpinning;
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header state={state} onImport={handleImport} />
+      <Header state={state} onImport={handleImport} onReset={handleReset} />
 
       <main className="max-w-4xl mx-auto px-4 py-8 space-y-6">
 
