@@ -72,7 +72,7 @@ export default function RoundHistory({ rounds, participants, onDeleteRound }: Pr
                   >
                     <div className="px-4 pb-3 space-y-1.5 border-t border-stone-100">
                       {round.pairs.map((pair, idx) => {
-                        const names = pairToNames(pair, participants);
+                        const names = pairToNames(pair, participants, round.participantSnapshot);
                         const isTrio = names.length === 3;
                         return (
                           <div key={idx} className="flex items-center gap-2 text-sm text-stone-600 pt-1.5">

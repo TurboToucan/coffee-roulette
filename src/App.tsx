@@ -83,11 +83,14 @@ export default function App() {
 
   const handleConfirmRound = () => {
     if (pendingPairs.length === 0) return;
+    const snapshot: Record<string, string> = {};
+    state.participants.forEach((p) => { snapshot[p.id] = p.name; });
     const newRound = {
       id: (state.rounds[state.rounds.length - 1]?.id ?? 0) + 1,
       date: new Date().toISOString(),
       pairs: pendingPairs,
       participantIds: state.participants.filter((p) => p.active).map((p) => p.id),
+      participantSnapshot: snapshot,
     };
     setState((prev) => ({ ...prev, rounds: [...prev.rounds, newRound] }));
     setPendingPairs([]);

@@ -123,7 +123,7 @@ export function generatePairings(
   // Try up to 200 random shuffles to find a valid pairing
   for (let attempt = 0; attempt < 200; attempt++) {
     const shuffled = shuffle(ids);
-    const result = backtrack(shuffled, history, [], ids.length % 2 !== 0);
+    const result = backtrack(shuffled, history, [], ids.length % 2 === 0);
     if (result) return result;
   }
 
@@ -160,8 +160,9 @@ export function generatePairings(
 export function pairToNames(
   pair: Pair,
   participants: Participant[],
+  snapshot?: Record<string, string>,
 ): string[] {
   return pair.map(
-    (id) => participants.find((p) => p.id === id)?.name ?? id,
+    (id) => participants.find((p) => p.id === id)?.name ?? snapshot?.[id] ?? id,
   );
 }

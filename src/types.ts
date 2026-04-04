@@ -12,6 +12,7 @@ export interface Round {
   date: string; // ISO date string
   pairs: Pair[];
   participantIds: string[]; // who was active in this round
+  participantSnapshot: Record<string, string>; // id -> name at time of round, for display after deletion
 }
 
 export interface AppState {
