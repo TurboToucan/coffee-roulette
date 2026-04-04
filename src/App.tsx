@@ -12,7 +12,7 @@ import RoundHistory from './components/RoundHistory';
 const EMPTY_STATE: AppState = { participants: [], rounds: [] };
 
 function newId(): string {
-  return Math.random().toString(36).slice(2, 10);
+  return crypto.randomUUID();
 }
 
 export default function App() {
