@@ -35,6 +35,32 @@ function shuffle<T>(arr: T[]): T[] {
 /**
  * Attempts to build a valid pairing using backtracking.
  * Returns an array of pairs/trios, or null if no valid pairing found.
+ *
+ * Priority order:
+ *
+ * 1. BASE CASE — remaining is empty: we're done, return the result.
+ *
+ * 2. LATE TRIO (remaining.length === 1) — one person is left over.
+ *    Try merging them into the most recently formed pair to make a trio.
+ *    Only attempted if no trio has been formed yet (trioDone = false).
+ *    If the merge would repeat a past pairing, return null and let the
+ *    caller backtrack to a different earlier pairing.
+ *
+ * 3. PAIR FIRST — try pairing `first` with each other remaining person
+ *    (skipping anyone they've already met). For each valid partner, recurse
+ *    on the rest. If the recursion succeeds, bubble the result up. If it
+ *    dead-ends, try the next partner (backtracking).
+ *
+ * 4. EARLY TRIO (only if all pairs failed AND no trio yet AND remaining is odd) —
+ *    try placing `first` into a trio with two other people, none of whom have
+ *    met each other or `first`. Only attempted for odd remaining counts because
+ *    a trio with even remaining always leaves one person stranded (trioDone=true
+ *    blocks the late-trio merge), making it an impossible dead end.
+ *    This block is needed when `first` can be paired with some people but every
+ *    such pairing causes a downstream dead-end, yet a trio involving `first`
+ *    would leave the rest in a solvable state.
+ *    Example: history {A-D, A-E, B-D, B-E, C-D, C-E} with 5 people —
+ *    the only solution is trio [A,B,C] + pair [D,E], which requires this block.
  */
 function backtrack(
   remaining: string[],
@@ -78,8 +104,8 @@ function backtrack(
     }
   }
 
-  // If odd number and no trio yet, try forming a trio with `first` + two others
-  if (!trioDone && remaining.length >= 3) {
+  // If odd number of remaining participants and no trio yet, try forming a trio with `first` + two others
+  if (!trioDone && remaining.length >= 3 && remaining.length % 2 !== 0) {
     for (let i = 0; i < rest.length; i++) {
       for (let j = i + 1; j < rest.length; j++) {
         const p1 = rest[i];
@@ -123,7 +149,7 @@ export function generatePairings(
   // Try up to 200 random shuffles to find a valid pairing
   for (let attempt = 0; attempt < 200; attempt++) {
     const shuffled = shuffle(ids);
-    const result = backtrack(shuffled, history, [], ids.length % 2 === 0);
+    const result = backtrack(shuffled, history, [], false);
     if (result) return result;
   }
 
@@ -134,7 +160,7 @@ export function generatePairings(
 
   for (let attempt = 0; attempt < 100; attempt++) {
     const shuffled = shuffle(ids);
-    const result = backtrack(shuffled, new Set(), [], ids.length % 2 !== 0);
+    const result = backtrack(shuffled, new Set(), [], false);
     if (!result) continue;
     const score = result.reduce((acc, pair) => {
       for (let i = 0; i < pair.length; i++) {
