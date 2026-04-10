@@ -143,6 +143,14 @@ describe('generatePairings', () => {
     expect(generatePairings(participants, [])).toEqual([])
   })
 
+  it('returns empty when only one participant is active', () => {
+    const participants: Participant[] = [
+      { id: 'id-0', name: 'Alice', active: true,  joinedRound: 1 },
+      { id: 'id-1', name: 'Bob',   active: false, joinedRound: 1 },
+    ]
+    expect(generatePairings(participants, [])).toEqual([])
+  })
+
   // --- History avoidance ---
 
   it('avoids repeating a previous pairing', () => {
