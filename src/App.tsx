@@ -56,6 +56,15 @@ export default function App() {
     }));
   }, []);
 
+  const renameParticipant = useCallback((id: string, newName: string) => {
+    setState((prev) => ({
+      ...prev,
+      participants: prev.participants.map((p) =>
+        p.id === id ? { ...p, name: newName } : p
+      ),
+    }));
+  }, []);
+
   const removeParticipant = useCallback((id: string) => {
     setState((prev) => ({
       ...prev,
@@ -199,6 +208,7 @@ export default function App() {
             onAdd={addParticipant}
             onToggleActive={toggleActive}
             onRemove={removeParticipant}
+            onRename={renameParticipant}
           />
           <RoundHistory
             rounds={state.rounds}

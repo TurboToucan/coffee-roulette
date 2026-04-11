@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserPlus, Pause, Play, Trash2 } from 'lucide-react';
+import { UserPlus, Pause, Play, Trash2, Check, X } from 'lucide-react';
 import type { Participant } from '../types';
 
 interface Props {
@@ -8,10 +8,29 @@ interface Props {
   onAdd: (name: string) => void;
   onToggleActive: (id: string) => void;
   onRemove: (id: string) => void;
+  onRename: (id: string, newName: string) => void;
 }
 
-export default function ParticipantList({ participants, onAdd, onToggleActive, onRemove }: Props) {
+export default function ParticipantList({ participants, onAdd, onToggleActive, onRemove, onRename }: Props) {
   const [input, setInput] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState('');
+  const editInputRef = useRef<HTMLInputElement>(null);
+
+  const startEdit = (p: Participant) => {
+    setEditingId(p.id);
+    setEditValue(p.name);
+    setTimeout(() => editInputRef.current?.select(), 0);
+  };
+
+  const commitEdit = () => {
+    if (editingId && editValue.trim()) {
+      onRename(editingId, editValue.trim());
+    }
+    setEditingId(null);
+  };
+
+  const cancelEdit = () => setEditingId(null);
 
   const handleAdd = () => {
     const name = input.trim();
@@ -69,24 +88,55 @@ export default function ParticipantList({ participants, onAdd, onToggleActive, o
                   : 'bg-stone-50 border-stone-200 opacity-60'
               }`}
             >
-              <span className={`text-sm font-medium ${p.active ? 'text-stone-800' : 'text-stone-500 line-through'}`}>
-                {p.name}
-              </span>
+              {editingId === p.id ? (
+                <input
+                  ref={editInputRef}
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') commitEdit();
+                    if (e.key === 'Escape') cancelEdit();
+                  }}
+                  onBlur={commitEdit}
+                  className="flex-1 text-sm font-medium px-1 py-0.5 rounded border border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
+                />
+              ) : (
+                <span
+                  onClick={() => startEdit(p)}
+                  title="Click to rename"
+                  className={`text-sm font-medium cursor-text hover:text-amber-600 hover:bg-amber-100 px-1 rounded-md transition-colors ${p.active ? 'text-stone-800' : 'text-stone-500 line-through'}`}
+                >
+                  {p.name}
+                </span>
+              )}
               <div className="flex items-center gap-1">
-                <button
-                  onClick={() => onToggleActive(p.id)}
-                  title={p.active ? 'Pause participant' : 'Resume participant'}
-                  className="p-1.5 rounded-md text-stone-400 hover:text-amber-600 hover:bg-amber-100 transition-colors cursor-pointer"
-                >
-                  {p.active ? <Pause size={14} /> : <Play size={14} />}
-                </button>
-                <button
-                  onClick={() => onRemove(p.id)}
-                  title="Remove participant"
-                  className="p-1.5 rounded-md text-stone-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
-                >
-                  <Trash2 size={14} />
-                </button>
+                {editingId === p.id ? (
+                  <>
+                    <button onClick={commitEdit} title="Save" className="p-1.5 rounded-md text-green-500 hover:bg-green-50 transition-colors cursor-pointer">
+                      <Check size={14} />
+                    </button>
+                    <button onClick={cancelEdit} title="Cancel" className="p-1.5 rounded-md text-stone-400 hover:bg-stone-100 transition-colors cursor-pointer">
+                      <X size={14} />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => onToggleActive(p.id)}
+                      title={p.active ? 'Pause participant' : 'Resume participant'}
+                      className="p-1.5 rounded-md text-stone-400 hover:text-amber-600 hover:bg-amber-100 transition-colors cursor-pointer"
+                    >
+                      {p.active ? <Pause size={14} /> : <Play size={14} />}
+                    </button>
+                    <button
+                      onClick={() => onRemove(p.id)}
+                      title="Remove participant"
+                      className="p-1.5 rounded-md text-stone-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </>
+                )}
               </div>
             </motion.li>
           ))}
