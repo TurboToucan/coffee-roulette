@@ -12,8 +12,8 @@ interface Props {
   onSpinComplete: () => void;
 }
 
-/** Cycles through random names during the spin animation */
-function SlotReel({ finalName, spin }: { finalName: string; spin: boolean }) {
+/** Cycles through participant names during the spin animation */
+function SlotReel({ finalName, spin, names, offset = 0 }: { finalName: string; spin: boolean; names: string[]; offset?: number }) {
   const [displayed, setDisplayed] = useState(finalName);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -22,10 +22,9 @@ function SlotReel({ finalName, spin }: { finalName: string; spin: boolean }) {
       setDisplayed(finalName);
       return;
     }
-    const fakeNames = ['Alex', 'Sam', 'Jordan', 'Riley', 'Morgan', 'Casey', 'Taylor', 'Drew', 'Jamie', 'Quinn'];
-    let i = 0;
+    let i = offset;
     intervalRef.current = setInterval(() => {
-      setDisplayed(fakeNames[i % fakeNames.length]);
+      setDisplayed(names[i % names.length]);
       i++;
     }, 80);
     return () => {
@@ -87,12 +86,12 @@ export default function SlotMachine({ isSpinning, pairs, participants, onSpinCom
       {/* Spinning reel preview */}
       {spinning && (
         <div className="flex justify-center items-center gap-3 py-8 px-4 bg-amber-50 rounded-xl border-2 border-dashed border-amber-200 mb-4">
-          <div className="text-2xl overflow-hidden h-8 flex items-center">
-            <SlotReel finalName="???" spin={true} />
+          <div className="text-2xl w-32 h-8 flex items-center justify-end overflow-hidden">
+            <SlotReel finalName="???" spin={true} names={participants.filter(p => p.active).map(p => p.name)} />
           </div>
-          <span className="text-stone-400 text-lg">☕</span>
-          <div className="text-2xl overflow-hidden h-8 flex items-center">
-            <SlotReel finalName="???" spin={true} />
+          <span className="text-stone-400 text-lg flex-shrink-0">☕</span>
+          <div className="text-2xl w-32 h-8 flex items-center justify-start overflow-hidden">
+            <SlotReel finalName="???" spin={true} names={participants.filter(p => p.active).map(p => p.name)} offset={Math.ceil(participants.filter(p => p.active).length / 2)} />
           </div>
         </div>
       )}
