@@ -129,7 +129,9 @@ export default function ParticipantList({ participants, onAdd, onToggleActive, o
                       {p.active ? <Pause size={14} /> : <Play size={14} />}
                     </button>
                     <button
-                      onClick={() => onRemove(p.id)}
+                      onClick={() => {
+                        if (confirm(`Remove ${p.name}? This cannot be undone.`)) onRemove(p.id);
+                      }}
                       title="Remove participant"
                       className="p-1.5 rounded-md text-stone-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
                     >

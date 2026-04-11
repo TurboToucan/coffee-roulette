@@ -69,7 +69,6 @@ export default function App() {
     setState((prev) => ({
       ...prev,
       participants: prev.participants.filter((p) => p.id !== id),
-      // Keep rounds intact — removed participant names will show as their ID if missing
     }));
   }, []);
 
@@ -235,6 +234,7 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
     </div>
   );
 }
